@@ -103,7 +103,7 @@ export default function RingControl() {
       await apiRequest("POST", `/api/rings/${ringId}/activities`, { message, time });
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: [`/api/rings/${ringId}/activities`] });
+      queryClient.invalidateQueries({ queryKey: ["/api/rings", ringId, "activities"] });
     },
   });
 
