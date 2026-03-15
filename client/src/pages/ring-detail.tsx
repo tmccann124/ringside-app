@@ -27,7 +27,7 @@ export default function RingDetail() {
   });
 
   const { data: activities } = useQuery<Activity[]>({
-    queryKey: [`/api/rings/${ringId}/activities`],
+    queryKey: ["/api/rings", ringId, "activities"],
     refetchInterval: 5000,
   });
 
