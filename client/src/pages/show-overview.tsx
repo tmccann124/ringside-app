@@ -1,6 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { useParams, Link } from "wouter";
 import { ArrowLeft } from "lucide-react";
+import { useWebSocket } from "@/lib/useWebSocket";
 import type { Show, Ring } from "@shared/schema";
 
 function StatusDot({ status }: { status: string }) {
@@ -61,7 +62,7 @@ function RingCard({ ring }: { ring: Ring }) {
         )}
 
         <p className="text-xs text-muted-foreground mt-3">
-          Updated {ring.updatedAt}
+          Updated {ring.updatedAt ? new Date(ring.updatedAt).toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" }) : ""}
         </p>
       </div>
     </Link>
@@ -72,12 +73,16 @@ export default function ShowOverview() {
   const params = useParams<{ showId: string }>();
   const showId = params.showId;
 
+  // Real-time updates via WebSocket
+  useWebSocket(showId);
+
   const { data: show } = useQuery<Show>({
     queryKey: ["/api/shows", showId],
   });
 
   const { data: rings, isLoading } = useQuery<Ring[]>({
-    queryKey: [`/api/shows/${showId}/rings`],
+    queryKey: ["/api/shows", showId, "rings"],
+    refetchInterval: 5000, // fallback polling
   });
 
   return (
