@@ -1,13 +1,16 @@
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Link } from "wouter";
-import { Search } from "lucide-react";
+import { Search, LogIn, LayoutDashboard, LogOut } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Button } from "@/components/ui/button";
+import { useAuth } from "@/lib/auth";
 import type { Show } from "@shared/schema";
 
 export default function SelectShow() {
   const [search, setSearch] = useState("");
+  const { user, logout, isOrganizer } = useAuth();
 
   const { data: shows, isLoading } = useQuery<Show[]>({
     queryKey: ["/api/shows"],
@@ -19,10 +22,34 @@ export default function SelectShow() {
 
   return (
     <div className="min-h-screen bg-background px-5 py-8 max-w-lg mx-auto" data-testid="select-show-page">
-      {/* Logo / Title */}
-      <h1 className="text-2xl font-bold tracking-tight mb-6" data-testid="app-title">
-        Ringside
-      </h1>
+      {/* Header with auth */}
+      <div className="flex items-center justify-between mb-6">
+        <h1 className="text-2xl font-bold tracking-tight" data-testid="app-title">
+          Ringside
+        </h1>
+        <div className="flex items-center gap-2">
+          {user ? (
+            <>
+              {isOrganizer && (
+                <Link href="/dashboard">
+                  <Button variant="outline" size="sm" className="rounded-lg text-xs" data-testid="btn-dashboard">
+                    <LayoutDashboard className="h-3.5 w-3.5 mr-1" /> Dashboard
+                  </Button>
+                </Link>
+              )}
+              <Button variant="ghost" size="sm" className="rounded-lg text-xs" onClick={logout} data-testid="btn-logout">
+                <LogOut className="h-3.5 w-3.5 mr-1" /> {user.name.split(" ")[0]}
+              </Button>
+            </>
+          ) : (
+            <Link href="/auth">
+              <Button variant="outline" size="sm" className="rounded-lg text-xs" data-testid="btn-sign-in">
+                <LogIn className="h-3.5 w-3.5 mr-1" /> Sign In
+              </Button>
+            </Link>
+          )}
+        </div>
+      </div>
 
       {/* Search */}
       <div className="relative mb-6">
